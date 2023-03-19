@@ -22,3 +22,14 @@ python docs.py -h
 #   --question QUESTION  your question about the docs
 #   --prompt PROMPT      Customized prompt to be prepended to base system prompt (optional)
 ```
+
+### Embed documents into a csv file
+```bash
+python embed.py --docs_dir "data/faq"
+# python embed.py -h
+# usage: embed.py [-h] [--docs_dir DOCS_DIR]
+
+# options:
+#   -h, --help           show this help message and exit
+#   --docs_dir DOCS_DIR  dir of docs to embed
+```

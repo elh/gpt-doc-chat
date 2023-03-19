@@ -1,2 +1,4 @@
 openai >= v0.27.2
+openai[datalib] >= v0.27.2
+openai[embeddings] >= v0.27.2
 python-dotenv >= v1.0.0
