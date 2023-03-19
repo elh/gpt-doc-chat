@@ -17,10 +17,6 @@ modes = {
     "finance": {
         "prompt": "This is a chat with personal financial advisor '$$!'. '$$!' is professional and responds with concise, actionable, informative recommendations.",
         "bot_name": "$$!"
-    },
-    "rap": {
-        "prompt": "This is an infamous rap cypher starring 'DOG', a lyrical protege of MF DOOM and Andre 3000. MCs are playing off of each other trading bars and continuing rhyme schemes.",
-        "bot_name": "DOG"
     }
 }
 
@@ -28,7 +24,7 @@ def main():
     load_dotenv()
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Chat with AI')
     parser.add_argument('--mode', type=str, default="", help='modes: ' + ", ".join(modes.keys()))
     args = parser.parse_args()
     if args.mode not in modes:

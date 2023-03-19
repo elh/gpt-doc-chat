@@ -5,8 +5,6 @@ import argparse
 from dotenv import load_dotenv
 import openai
 
-# TODO: filter relevant docs by semantic search. save embeddings
-
 MODEL = "text-davinci-003"
 LOGS_DIRECTORY = "logs/docs"
 
@@ -16,7 +14,7 @@ def main():
     load_dotenv()
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Answer questions based on a provided document')
     parser.add_argument('--doc', type=str, default="", help='doc file to prompt with')             # explicitly configured
     parser.add_argument('--question', type=str, default="", help='your question about the docs')
     parser.add_argument('--prompt', type=str, default="", help='Customized prompt to be prepended to base system prompt (optional)')

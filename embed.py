@@ -12,7 +12,7 @@ def main():
     load_dotenv()
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Embed documents into a csv file')
     parser.add_argument('--docs_dir', type=str, default="", help='dir of docs to embed')
     args = parser.parse_args()
     if args.docs_dir == "":
