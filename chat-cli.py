@@ -7,7 +7,7 @@ import openai
 
 # text-davinci-003 is 10x the cost for chat workflows but has support for fine tuning
 MODEL = "text-davinci-003"
-LOGS_DIRECTORY = "logs"
+LOGS_DIRECTORY = "logs/chat"
 
 modes = {
     "therapy": {
