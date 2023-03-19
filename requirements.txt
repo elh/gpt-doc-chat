@@ -1,0 +1,2 @@
+openai >= v0.27.2
+python-dotenv >= v1.0.0
