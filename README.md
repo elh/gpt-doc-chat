@@ -21,15 +21,15 @@ python chat-cli.py -h
 #   --mode MODE  modes: therapy, finance
 ```
 
-### Answer questions based on a provided document
+### Answer questions based on a single provided document
 
 This takes a specific document to feed in as prompt context. The document must fit cleanly in the total token limit for the used model.
 
 ```bash
-python docs.py --prompt "You are a helpful customer service assistant AI." --doc "data/faq.md" --question "How can i contact a human?"
+python query-single-doc.py --prompt "You are a helpful customer service assistant AI." --doc "data/faq.md" --question "How can i contact a human?"
 
-python docs.py -h
-# usage: docs.py [-h] [--doc DOC] [--question QUESTION] [--prompt PROMPT]
+python query-single-doc.py -h
+# usage: query-single-doc.py [-h] [--doc DOC] [--question QUESTION] [--prompt PROMPT]
 
 # options:
 #   -h, --help           show this help message and exit
@@ -38,7 +38,7 @@ python docs.py -h
 #   --prompt PROMPT      Customized prompt to be prepended to base system prompt (optional)
 ```
 
-### Answer questions based on a precomputed document embeddings
+### Answer questions based on document embeddings
 
 TODO: We have all the elements now!
 
