@@ -4,9 +4,13 @@ import datetime
 import argparse
 from dotenv import load_dotenv
 import openai
+import pandas as pd
+import numpy as np
+
+from semantic_search import semantic_search
 
 MODEL = "text-davinci-003"
-LOGS_DIRECTORY = "logs/query-single-doc"
+LOGS_DIRECTORY = "logs/query-docs"
 
 BASE_PROMPT = "Given the following DOCUMENTATION please answer the following QUESTION."
 
@@ -14,13 +18,13 @@ def main():
     load_dotenv()
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
-    parser = argparse.ArgumentParser(description='Answer questions based on a provided document')
-    parser.add_argument('--doc', type=str, default="", help='doc file to prompt with')             # explicitly configured
+    parser = argparse.ArgumentParser(description='Answer questions based on a corpus of documents')
+    parser.add_argument('--embedding_csv', type=str, default="", help='embedding csv file')
     parser.add_argument('--question', type=str, default="", help='your question about the docs')
     parser.add_argument('--prompt', type=str, default="", help='Customized prompt to be prepended to base system prompt (optional)')
     args = parser.parse_args()
-    if args.question == "" or args.doc == "":
-        print("ERROR: Doc file and question is required.")
+    if args.question == "" or args.embedding_csv == "":
+        print("ERROR: Embedding CSV and question are required.")
         sys.exit(1)
 
     if not os.path.exists(LOGS_DIRECTORY):
@@ -28,16 +32,32 @@ def main():
     now = datetime.datetime.now()
     log_file_name = LOGS_DIRECTORY + "/" + str(now.strftime("%Y_%m_%d_%H.%M.%S")) + ".txt"
 
-    # hardcoded file + prompt
-    f = open(args.doc, "r")
-    file = f.read()
+    ################ Semantic search for most similar documents ################
+    df = pd.read_csv(args.embedding_csv)
+    df["embedding"] = df.embedding.apply(eval).apply(np.array)
 
-    prompt = args.prompt + "." + BASE_PROMPT
-    prompt += "\n\nDOCUMENTATION:\n" + file
+    results = semantic_search(df, args.question, n=5)
+    print(results)
+
+    ############################## Build up prompt ##############################
+    prompt = args.prompt + "." + BASE_PROMPT + "\n\nDOCUMENTATION:\n"
+
+    token_sum = 0
+    for i in results.index:
+        content = results['content'][i]
+        total_tokens = results['total_tokens'][i]
+
+        # bail if over token limit
+        token_sum += total_tokens
+        if token_sum > 3072:
+            break
+        prompt += content
+
     prompt += "\n\nQUESTION:\n" + args.question + "\n\nANSWER:"
     print(prompt)
 
-    resp = openai.Completion.create(model=MODEL, prompt=prompt, max_tokens=256)
+    ######################### Hit GPT for completion ##########################
+    resp = openai.Completion.create(model=MODEL, prompt=prompt, max_tokens=512)
     output = resp.get("choices", [{}])[0].get("text", "").lstrip('\n').lstrip(' ')
     if output == "":
         print("ERROR: No response from OpenAI 🤖\n" + resp)

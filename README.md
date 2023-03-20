@@ -56,10 +56,10 @@ python embed.py -h
 
 ### Semantic search with embeddings
 ```bash
-python semantic-search.py --embedding_csv "data/embeddings/data_faq.csv" --query "is this telemedicine only?"
+python semantic_search.py --embedding_csv "data/embeddings/data_faq.csv" --query "is this telemedicine only?"
 
-python semantic-search.py -h
-# usage: semantic-search.py [-h] [--embedding_csv EMBEDDING_CSV] [--query QUERY]
+python semantic_search.py -h
+# usage: semantic_search.py [-h] [--embedding_csv EMBEDDING_CSV] [--query QUERY]
 
 # options:
 #   -h, --help            show this help message and exit
