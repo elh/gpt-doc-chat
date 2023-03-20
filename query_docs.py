@@ -10,7 +10,7 @@ import numpy as np
 from semantic_search import semantic_search
 
 MODEL = "text-davinci-003"
-LOGS_DIRECTORY = "logs/query-docs"
+LOGS_DIRECTORY = "logs/query_docs"
 
 BASE_PROMPT = "Given the following DOCUMENTATION please answer the following QUESTION."
 

@@ -1,46 +1,38 @@
 # gpt-park 📎
 
+My hands-on learning of the GPT APIs
+
 ### Setup
 Make sure `OPENAI_API_KEY` env var is set or provided via `.env` file.
 ```
 pip install -r requirements.txt
 ```
 
-### Chat with AI
+## GPT-powered, conversation search of documents
 
-Each response carries over the context of the conversation (until we hit a token limit).
+1. Put a set of documents in a directory Each file should be less than 3K tokens. e.g.`my_dir/`
+2. Save the embeddings of those documents in a csv file e.g. `python embed.py --docs_dir my_dir` -> `data/embeddings/my_dir.csv`
+3. Ask natural language questions of the documents! e.g. `python query-docs.py --embedding_csv data/embeddings/my_dir.csv --question "What are some new features?" --prompt "You are a helpful customer service AI."`
 
-```bash
-python chat-cli.py --mode "therapy"
+### Answer questions based on document embeddings ⭐️
 
-python chat-cli.py -h
-# usage: chat-cli.py [-h] [--mode MODE]
-
-# options:
-#   -h, --help   show this help message and exit
-#   --mode MODE  modes: therapy, finance
-```
-
-### Answer questions based on a single provided document
-
-This takes a specific document to feed in as prompt context. The document must fit cleanly in the total token limit for the used model.
+Query against a corpus of documents that is larger than the GPT token limit. We first preprocess the documents by generating embedding vectors and storing them. When a new query comes in, we embed it using the same model and run do a local cosine similarity ranking to find the most relevant documents. We fold as many of those relevant documents we can under the token limit into the the prompt. We then send the final prompt to GPT for completion.
 
 ```bash
-python query-single-doc.py --prompt "You are a helpful customer service assistant AI." --doc "data/faq.md" --question "How can i contact a human?"
+python query-docs.py --embedding_csv data/embeddings/faq.csv --question "What are some new features?" --prompt "You are a helpful customer service AI."
 
-python query-single-doc.py -h
-# usage: query-single-doc.py [-h] [--doc DOC] [--question QUESTION] [--prompt PROMPT]
+python query_docs.py -h
+# usage: query_docs.py [-h] [--embedding_csv EMBEDDING_CSV] [--question QUESTION] [--prompt PROMPT]
+
+# Answer questions based on a corpus of documents
 
 # options:
-#   -h, --help           show this help message and exit
-#   --doc DOC            doc file to prompt with
-#   --question QUESTION  your question about the docs
-#   --prompt PROMPT      Customized prompt to be prepended to base system prompt (optional)
+#   -h, --help            show this help message and exit
+#   --embedding_csv EMBEDDING_CSV
+#                         embedding csv file
+#   --question QUESTION   your question about the docs
+#   --prompt PROMPT       Customized prompt to be prepended to base system prompt (optional)
 ```
-
-### Answer questions based on document embeddings
-
-TODO: We have all the elements now!
 
 ### Embed documents into a csv file
 ```bash
@@ -66,4 +58,38 @@ python semantic_search.py -h
 #   --embedding_csv EMBEDDING_CSV
 #                         embedding csv file
 #   --query QUERY         query to semantic search
+```
+
+### Answer questions based on a single provided document
+
+This takes a specific document to feed in as prompt context. The document must fit cleanly in the total token limit for the used model.
+
+```bash
+python query_single_doc.py --prompt "You are a helpful customer service assistant AI." --doc "data/faq.md" --question "How can i contact a human?"
+
+python query_single_doc.py -h
+# usage: query_single_doc.py [-h] [--doc DOC] [--question QUESTION] [--prompt PROMPT]
+
+# options:
+#   -h, --help           show this help message and exit
+#   --doc DOC            doc file to prompt with
+#   --question QUESTION  your question about the docs
+#   --prompt PROMPT      Customized prompt to be prepended to base system prompt (optional)
+```
+
+## Chat
+
+### Chat with AI
+
+Each response carries over the context of the conversation (until we hit a token limit).
+
+```bash
+python chat_cli.py --mode "therapy"
+
+python chat_cli.py -h
+# usage: chat_cli.py [-h] [--mode MODE]
+
+# options:
+#   -h, --help   show this help message and exit
+#   --mode MODE  modes: therapy, finance
 ```

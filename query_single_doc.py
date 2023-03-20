@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import openai
 
 MODEL = "text-davinci-003"
-LOGS_DIRECTORY = "logs/query-single-doc"
+LOGS_DIRECTORY = "logs/query_single_doc"
 
 BASE_PROMPT = "Given the following DOCUMENTATION please answer the following QUESTION."
 
