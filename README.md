@@ -1,6 +1,11 @@
-# gpt-park 📎
+# gpt-doc-chat 📎
 
-My hands-on learning of the GPT APIs
+GPT-powered, conversational search of documents
+1. Put a set of documents in a directory. Note: each file should be less than 4K tokens. e.g.`my_dir/`.
+2. Generate and save the embeddings of those documents in a csv file e.g. `python embed.py --docs_dir my_dir` -> `data/embeddings/my_dir.csv`.
+3. Ask natural language questions of the documents! e.g. `python query-docs.py --embedding_csv data/embeddings/my_dir.csv --question "Did my account change on March 14th change my cost?" --prompt "You are a helpful customer service AI."`. This can also be served as a web API with `server.py`.
+
+This is a vanilla implementation of GPT semantic search and chat completion I did as hands-on learning. This is naive but surprisingly functional, so I am on the LLM hype train.
 
 ### Setup
 Make sure `OPENAI_API_KEY` env var is set or provided via `.env` file.
@@ -8,18 +13,12 @@ Make sure `OPENAI_API_KEY` env var is set or provided via `.env` file.
 pip install -r requirements.txt
 ```
 
-## GPT-powered, conversational search of documents
-
-1. Put a set of documents in a directory. Each file should be less than 4K tokens. e.g.`my_dir/`
-2. Save the embeddings of those documents in a csv file e.g. `python embed.py --docs_dir my_dir` -> `data/embeddings/my_dir.csv`
-3. Ask natural language questions of the documents! e.g. `python query-docs.py --embedding_csv data/embeddings/my_dir.csv --question "What are some new features?" --prompt "You are a helpful customer service AI."`
-
 ### Answer questions based on document embeddings ⭐️
 
 Query against a corpus of documents that is larger than the GPT token limit. We first preprocess the documents by generating embedding vectors and storing them. When a new query comes in, we embed it using the same model and run a local cosine similarity ranking to find the most relevant documents. We merge as many of those relevant documents as we can under the token limit into the the prompt. We then send the final prompt to GPT for completion.
 
 ```bash
-python query-docs.py --embedding_csv data/embeddings/faq.csv --question "What are some new features?" --prompt "You are a helpful customer service AI."
+python query-docs.py --embedding_csv data/embeddings/faq.csv --question "Did my account change on March 14th change my cost?" --prompt "You are a helpful customer service AI."
 
 python query_docs.py -h
 # usage: query_docs.py [-h] [--embedding_csv EMBEDDING_CSV] [--question QUESTION] [--prompt PROMPT]
@@ -35,6 +34,8 @@ python query_docs.py -h
 ```
 
 I also have a `query-docs_completions.py` version uses the older and more expensive `text-davinci-003` model and completions API, instead of chat APIs. The benefit to that approach is that it respects sysytem prompts much more.
+
+I also have a simple, janky server that wraps the `query-docs.py` script for prototyping web integrations: `server.py`
 
 ### Embed documents into a csv file
 ```bash
