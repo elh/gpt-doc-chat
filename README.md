@@ -8,15 +8,15 @@ Make sure `OPENAI_API_KEY` env var is set or provided via `.env` file.
 pip install -r requirements.txt
 ```
 
-## GPT-powered, conversation search of documents
+## GPT-powered, conversational search of documents
 
-1. Put a set of documents in a directory Each file should be less than 3K tokens. e.g.`my_dir/`
+1. Put a set of documents in a directory. Each file should be less than 4K tokens. e.g.`my_dir/`
 2. Save the embeddings of those documents in a csv file e.g. `python embed.py --docs_dir my_dir` -> `data/embeddings/my_dir.csv`
 3. Ask natural language questions of the documents! e.g. `python query-docs.py --embedding_csv data/embeddings/my_dir.csv --question "What are some new features?" --prompt "You are a helpful customer service AI."`
 
 ### Answer questions based on document embeddings ⭐️
 
-Query against a corpus of documents that is larger than the GPT token limit. We first preprocess the documents by generating embedding vectors and storing them. When a new query comes in, we embed it using the same model and run do a local cosine similarity ranking to find the most relevant documents. We fold as many of those relevant documents we can under the token limit into the the prompt. We then send the final prompt to GPT for completion.
+Query against a corpus of documents that is larger than the GPT token limit. We first preprocess the documents by generating embedding vectors and storing them. When a new query comes in, we embed it using the same model and run a local cosine similarity ranking to find the most relevant documents. We merge as many of those relevant documents as we can under the token limit into the the prompt. We then send the final prompt to GPT for completion.
 
 ```bash
 python query-docs.py --embedding_csv data/embeddings/faq.csv --question "What are some new features?" --prompt "You are a helpful customer service AI."
@@ -34,7 +34,7 @@ python query_docs.py -h
 #   --prompt PROMPT       Customized prompt to be prepended to base system prompt (optional)
 ```
 
-I also have an older `query-docs_completions.py` version which was using the weaker and more expensive `text-davinci-003` model and completions API, instead of Chat.
+I also have a `query-docs_completions.py` version uses the older and more expensive `text-davinci-003` model and completions API, instead of chat APIs. The benefit to that approach is that it respects sysytem prompts much more.
 
 ### Embed documents into a csv file
 ```bash
@@ -83,7 +83,7 @@ python query_single_doc.py -h
 
 ### Chat with AI
 
-Each response carries over the context of the conversation (until we hit a token limit).
+Each response extends the context of the conversation (until we hit a token limit).
 
 ```bash
 python chat_cli.py --mode "therapy"
