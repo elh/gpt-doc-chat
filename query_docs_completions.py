@@ -10,13 +10,13 @@ import numpy as np
 from semantic_search import semantic_search
 
 '''
-NOTE: powered by GPT chat
+WARN: powered by GPT completions. Prefer query_docs
 '''
 
-MODEL = "gpt-3.5-turbo"
-LOGS_DIRECTORY = "logs/query_docs"
+MODEL = "text-davinci-003"
+LOGS_DIRECTORY = "logs/query_docs_completions"
 
-BASE_PROMPT = "Please answer the question based on the DOCUMENTATION. Please say 'I don't know' if you don't know the answer.'"
+BASE_PROMPT = "Given the following DOCUMENTATION please answer the following QUESTION."
 
 def main():
     load_dotenv()
@@ -44,7 +44,7 @@ def main():
     print(results)
 
     ############################## Build up prompt ##############################
-    system_prompt = args.prompt + "." + BASE_PROMPT + "\n\nDOCUMENTATION:\n"
+    prompt = args.prompt + "." + BASE_PROMPT + "\n\nDOCUMENTATION:\n"
 
     token_sum = 0
     for i in results.index:
@@ -55,37 +55,23 @@ def main():
         token_sum += total_tokens
         if token_sum > 3072:
             break
-        system_prompt += content
+        prompt += content
 
-    messages = [
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": args.question}
-    ]
-
-    print("SYSTEM PROMPT:\n" +
-          system_prompt + "\n\n" +
-          "QUESTION:\n" +
-          args.question + "\n\n")
+    prompt += "\n\nQUESTION:\n" + args.question + "\n\nANSWER:"
+    print(prompt)
 
     ######################### Hit GPT for completion ##########################
-    resp = openai.ChatCompletion.create(model=MODEL, messages=messages, max_tokens=512)
-    output = resp.get("choices", [{}])[0].get("message", {}).get("content", "").lstrip('\n').lstrip(' ')
+    resp = openai.Completion.create(model=MODEL, prompt=prompt, max_tokens=512)
+    output = resp.get("choices", [{}])[0].get("text", "").lstrip('\n').lstrip(' ')
     if output == "":
         print("ERROR: No response from OpenAI 🤖\n" + resp)
         sys.exit(1)
     total_tokens = resp.get("usage", {}).get("total_tokens", 0)
 
-    print("REPLY:\n" +
-          output + "\n\n----------\n" +
-          str(total_tokens) + " tokens. model: " + MODEL)
+    print(output)
+    print("\n----------\n" + str(total_tokens) + " tokens. model: " + MODEL)
 
-    open(log_file_name, 'w').write("SYSTEM PROMPT:\n" +
-                                   system_prompt + "\n\n" +
-                                   "QUESTION:\n" +
-                                   args.question + "\n\n" +
-                                   "REPLY:\n" +
-                                   output + "\n\n----------\n" +
-                                   str(total_tokens) + " tokens. model: " + MODEL) # full reset of file
+    open(log_file_name, 'w').write(prompt + "\n" + output + "\n\n----------\n" + str(total_tokens) + " tokens. model: " + MODEL) # full reset of file
 
 if __name__ == "__main__":
     main()

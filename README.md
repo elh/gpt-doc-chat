@@ -34,6 +34,8 @@ python query_docs.py -h
 #   --prompt PROMPT       Customized prompt to be prepended to base system prompt (optional)
 ```
 
+I also have an older `query-docs_completions.py` version which was using the weaker and more expensive `text-davinci-003` model and completions API, instead of Chat.
+
 ### Embed documents into a csv file
 ```bash
 python embed.py --docs_dir "data/faq"
